@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CoinPark NO4</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>COINPARK NO4</h1>
+    <div class="subtitle">コインパーク壺川満車率</div>
+  </header>
+
+  <section class="info-section">
+    <div class="weather">今日の天気<br/><span>☁️☁️</span></div>
+    <!--<div class="time">現在時刻: <strong>8:30</strong>-->
+      <p id="now-time"></p>
+    <script>
+      const now = new Date();
+      // フォーマット関数（例：2025-05-02 14:30）
+    function formatDateTime(date) {
+      //const y = date.getFullYear();
+      //const m = String(date.getMonth() + 1).padStart(2, '0');
+      //const d = String(date.getDate()).padStart(2, '0');
+      const h = String(date.getHours()).padStart(2, '0');
+      const min = String(date.getMinutes()).padStart(2, '0');
+      return `現在時刻：${h}:${min}`;
+    }
+
+    // 表示させる
+    document.getElementById("now-time").textContent = formatDateTime(now);
+    </script>
+    </div>
+    <div class="camera">カメラの精度<br/><span class="circle"></span></div>
+  </section>
+
+  <section class="circle-chart">
+    <div class="circle-container">
+      <div class="center-text">
+        <div>駐車率</div>
+        <div class="percent">50%</div>
+      </div>
+      <svg viewBox="0 0 36 36" class="circular-chart">
+        <path class="circle-bg"
+          d="M18 2.0845
+             a 15.9155 15.9155 0 0 1 0 31.831
+             a 15.9155 15.9155 0 0 1 0 -31.831" />
+        <path class="circle-red"
+          stroke-dasharray="50, 100"
+          d="M18 2.0845
+             a 15.9155 15.9155 0 0 1 0 31.831
+             a 15.9155 15.9155 0 0 1 0 -31.831" />
+      </svg>
+    </div>
+  </section>
+  <script>
+  /*
+  <!--円グラフ２-->
+  
+  <section class="circle-chart">
+    <div class="circle-container">
+      <div class="center-text">
+        <div>駐車率</div>
+        <div class="percent">50%</div>
+      </div>
+      <svg viewBox="0 0 36 36" class="circular-chart">
+        /* 背景円 */
+        <path class="circle-bg"
+          d="M18 2.0845
+             a 15.9155 15.9155 0 0 1 0 31.831
+             a 15.9155 15.9155 0 0 1 0 -31.831" />
+        <!-- 駐車率（緑） -->
+        <path class="circle-fill"
+          stroke-dasharray="50, 100"
+          d="M18 2.0845
+             a 15.9155 15.9155 0 0 1 0 31.831
+             a 15.9155 15.9155 0 0 1 0 -31.831" />
+        <!-- 空き（赤） -->
+        <path class="circle-rest"
+          stroke-dasharray="50, 100"
+          stroke-dashoffset="50"
+          d="M18 2.0845
+             a 15.9155 15.9155 0 0 1 0 31.831
+             a 15.9155 15.9155 0 0 1 0 -31.831" />
+      </svg>
+    </div>
+  </section>
+  */
+  </script>
+
+  <div class="remaining">残り30台</div>
+  
+  <section class="rates">
+    <h2>Parking rates <button onclick="location.reload()">更新ボタン 🔄</button></h2>
+    
+    <!-- 棒グラフの表示-->
+    <h1>駐車場の利用状況（例）</h1>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <canvas id="barChart"></canvas>
+
+  <script>
+    const ctx = document.getElementById('barChart').getContext('2d');
+    const barChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['月', '火', '水', '木', '金', '土', '日'],
+        datasets: [{
+          label: '駐車台数',
+          data: [12, 19, 8, 15, 10, 22, 5],
+          backgroundColor: 'rgba(54, 162, 235, 0.7)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: '台数'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: '曜日'
+            }
+          }
+        }
+      }
+    });
+  </script>
+  </section>
+</body>
+</html>
