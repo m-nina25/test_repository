@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>駐車料金計算</title>
+    <link rel="stylesheet" href="ParkingFeeStyle.css">
+</head>
+<body>
+    <div class="container">
+        <h1>駐車料金計算</h1>
+
+        <div class="input-group">
+            <label for="entry-time">入庫時間:</label>
+            <input type="time" id="entry-time" name="entry-time">
+        </div>
+
+        <div class="input-group">
+            <label for="exit-time">出庫時間:</label>
+            <input type="time" id="exit-time" name="exit-time">
+        </div>
+
+        <p>&nbsp;</p>
+
+        <button id="calculate-button">計算</button>
+
+        <p>&nbsp;</p>   <!--空白行-->
+
+        <!--　後々応用できる機能かも??
+        <div class="input-group">
+            <label for="hourly-rate">合計金額:</label>
+            <input type="number" id="hourly-rate" name="hourly-rate" value="100" min="0">
+            <span class="unit">円</span>
+        </div>
+        -->
+        <!--修正必須(下のresult-boxをべた書きしただけ！)-->
+        <p>駐車時間：8時間30分</p>
+        <p>駐車料金：800円</p>
+        
+        <div id="result" class="result-box">
+            <h2>計算結果</h2>
+            <p>駐車時間: <span id="parking-duration"></span></p>
+            <p>駐車料金: <span id="parking-fee"></span> 円</p>
+        </div>
+
+        <h1>料金体系</h1>
+        <p>最初の1時間：200円</p>
+        <p>以降30分ごと：100円</p>
+        <p>24時間最大：800円</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const entryTimeInput = document.getElementById('entry-time');
+            const exitTimeInput = document.getElementById('exit-time');
+            const hourlyRateInput = document.getElementById('hourly-rate');
+            const calculateButton = document.getElementById('calculate-button');
+            const parkingDurationSpan = document.getElementById('parking-duration');
+            const parkingFeeSpan = document.getElementById('parking-fee');
+            const resultBox = document.getElementById('result');
+
+            calculateButton.addEventListener('click', function() {
+                const entryTimeStr = entryTimeInput.value;
+                const exitTimeStr = exitTimeInput.value;
+                const hourlyRate = parseFloat(hourlyRateInput.value);
+
+                if (!entryTimeStr || !exitTimeStr || isNaN(hourlyRate)) {
+                    alert('入庫時間、出庫時間、または1時間あたりの料金を入力してください。');
+                    return;
+                }
+
+                const entryDate = new Date(`2025-05-01T${entryTimeStr}`); // 適当な日付を設定
+                const exitDate = new Date(`2025-05-01T${exitTimeStr}`);   // 同上
+
+                if (isNaN(entryDate.getTime()) || isNaN(exitDate.getTime())) {
+                    alert('無効な時間形式です。');
+                    return;
+                }
+
+                let timeDifference = exitDate.getTime() - entryDate.getTime();
+
+                // 出庫時間が入庫時間より前の場合は、翌日として計算
+                if (timeDifference < 0) {
+                    timeDifference += (24 * 60 * 60 * 1000); // 24時間分のミリ秒を加算
+                }
+
+                const parkingHours = timeDifference / (1000 * 60 * 60);
+                const parkingFee = Math.ceil(parkingHours) * hourlyRate; // 端数は切り上げ
+
+                parkingDurationSpan.textContent = `${Math.floor(parkingHours)}時間 ${Math.floor((parkingHours % 1) * 60)}分`;
+                parkingFeeSpan.textContent = parkingFee.toLocaleString();
+                resultBox.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>
