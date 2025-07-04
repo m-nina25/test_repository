@@ -1,0 +1,84 @@
+<body>
+      <div>
+
+        <label for="startTime">入庫時間：</label>
+        <input type="text" id="startTime" name="startTime" min="00" max="23" onkeyup="nextffield(this)">
+        <br>
+
+        <label for="endTime">出庫時間：</label>
+        <input type="month" id="endTime" name="endTime">
+        <br>
+
+        <button onclick="calculateFee()">料金を計算</button>
+
+        <div id="result"></div>
+
+        <script>
+          function calculateFee(){
+            const startTime = new Date(document.getElementById("startTime").value);
+            const endTime = new Date(document.getElementById("endTime").value);
+
+            if(isNaN(startTime.getTime()) || isNaN(endTime.getTime())){
+              alert("入庫時間と出庫時間を正しく入力してください。");
+              return;
+            }
+
+            //時間差を分単位で計算
+            const timeDifferenceMinutes = (endTime.getTime() - startTime.getTime()) / (1000 * 60);
+
+            //料金設定
+            const baseFee = 200; //初期料金
+            const additionalFeePer30Minutes = 100; //30分ごとの追加料金
+            const maxFee = 1000; //最大料金
+
+            //計算
+            let totalFee = baseFee;
+
+            //30分単位で料金を追加
+            let additionalMinutes = Math.ceil(timeDifferenceMinutes / 30);
+
+            if (additionalMinutes > 0){
+              totalFee += additionalMinutes * additionalFeePer30Minutes;
+            }
+
+            //最大料金を超えないように調整
+            if (totalFee > maxFee) {
+              totalFee = maxFee;
+            }
+
+            //結果を表示
+            document.getElementById("result").innerHTML =
+            <p>合計料金： ${totalFee}円</p>
+            ;
+
+          }
+        </script>
+
+        <br>
+        <br>
+
+        <script>
+          function nextfeild(str) {
+        if (str.value.length >= str.maxLength) {
+            for (var i = 0, elm = str.form.elements; i < elm.length; i++) {
+                if (elm[i] == str) {
+                    (elm[i + 1] || elm[0]).focus();
+                    break;
+                }
+            }
+        }
+        return (str);
+    }
+        </script>
+          <form name="">
+            <label for="starttime">入庫時間：</label>
+            <input class="under-line" type="text" name="starttime" id="starttime" placeholder="00" maxlength="2" size="2" onkeyup="nextffield(this)"> :  <input class="under-line" type="text" name="starttimeMin" id="starttimeMin" maxlength="2" size="2" placeholder="00" onkeyup="nextffield(this)">
+            <br>
+
+            <label for="endtime">出庫時間：</label>
+            <input class="under-line" type="text" name="endtime" id="endtime" maxlength="2" placeholder="00" size="2"> : <input  class="under-line" type="text" name="endtimeMin" id="endtimeMin" maxlength="2" placeholder="00" size="2">
+        </form>
+      </div>
+      
+    </body>
+

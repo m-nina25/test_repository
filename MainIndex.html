@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="description" content="メインページ">
+  <title>CoinPark NO4</title>
+  <link rel="stylesheet" href="MainStyle.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+  <header>
+    <div class="header">
+      <h1>Quick壺パ4</h1>
+      <h2>コインパーク壺川満車率</h2>
+      <div class="date">
+        <script>
+
+          //今日の日付データを変数に格納
+          //変数は"today"とする
+          var today = new Date();
+
+          //年・月・日・曜日を取得
+          var year = today.getFullYear();
+          var month = today.getMonth() + 1;
+          var week = today.getDay();
+          var day = today.getDate();
+
+          var week_ja = new
+            Array("日", "月", "火", "水", "木", "金", "土");
+
+          //年・月・日・曜日を書き出す
+          document.write(year + "/" + month + "/" + day + "/" + "(" + week_ja[week] + ")");
+        </script>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.2.0/chart.min.js"
+      integrity="sha512-VMsZqo0ar06BMtg0tPsdgRADvl0kDHpTbugCBBrL55KmucH6hP9zWdLIWY//OTfMnzz6xWQRxQqsUFefwHuHyg=="
+      crossorigin="anonymous">
+      </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@next/dist/chartjs-adapter-date-fns.bundle.min.js">
+      </script>
+  </header>
+
+  <div class="field"> <!-- 天気,時刻,カメラ精度 -->
+    <div class="weather">
+      <p>今日の天気</p>
+      
+    </div>
+    <div class="clock">
+      <script>
+            //時刻データを取得して変数に格納する
+            //変数は"time"とする
+            var time = new Date();
+
+            //時・分・秒を取得
+            var hour = time.getHours();
+            var minute = time.getMinutes().toString().padStart(2, '0');
+
+            document.write("現在時刻：" + hour + ":" + minute);
+      </script>
+    </div>
+    <div class="resolution">
+      <p>カメラの精度</p>
+    </div>
+  </div>
+
+  <canvas id="myDonutChart" width="400" height="400" style="display: block; margin: 0 auto;"></canvas>
+
+  <script>
+            // ページ読み込み時にデータを生成（例：駐車率）
+            const parkingRate = 70;
+            const availableRate = 100 - parkingRate;
+
+            // プラグイン（中央に値を描画）
+            const centerTextPlugin = {
+              id: 'centerTextPlugin',
+            afterDatasetsDraw(chart) {
+      const {ctx, chartArea} = chart;
+            const text = chart.data.datasets[0].data[0] + '%';  // ← データから動的に取得
+
+            const centerX = (chartArea.left + chartArea.right) / 2;
+            const centerY = (chartArea.top + chartArea.bottom) / 2;
+
+            ctx.save();
+            ctx.font = 'bold 40px sans-serif';
+            ctx.fillStyle = '#000';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, centerX, centerY);
+            ctx.restore();
+    }
+  };
+
+            const ctx = document.getElementById('myDonutChart').getContext('2d');
+            new Chart(ctx, {
+              type: 'doughnut',
+            data: {
+              labels: ['駐車中', '空車'],
+            datasets: [{
+              data: [parkingRate, availableRate],  // ← ページ読み込み時に決定
+            backgroundColor: [
+            'rgba(255, 99, 132, 0.7)',
+            'rgba(54, 162, 235, 0.7)',
+            ],
+            borderColor: [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            ],
+            borderWidth: 1
+      }]
+    },
+            options: {
+              responsive: false,
+            plugins: {
+              legend: {
+              position: 'bottom'
+        },
+            title: {
+              display: true,
+            text: '駐車率',
+            font: {
+              size: 25
+          }
+        }
+      }
+    },
+            plugins: [centerTextPlugin]
+  });
+
+  </script>
+
+  <div class="field2">
+    <div class="kousin"> <!-- 更新ボタン -->
+      <!--<h1>Parking rates</h1>-->
+      <br><br>
+      <input type="button" value="更新" onclick="kousin()">
+      <script>
+            function kousin() {
+              location.reload();
+        }
+      </script>
+    </div>
+  </div>
+
+  <script type="module" src="./dist/main.js"></script> <!-- 最後に置く -->
+
+  <div class="pricelist">
+
+    <label for="startTime">入庫時間：</label>
+    <input type="datetime-local" id="startTime" name="startTime">
+    <br>
+
+    <label for="endTime">出庫時間：</label>
+    <input type="datetime-local" id="endTime" name="endTime">
+    <br>
+
+    <button onclick="calculateFee()">料金を計算</button>
+
+    <div id="result"></div>
+
+    <script>
+            function calculateFee() {
+        const startTime = new Date(document.getElementById("startTime").value);
+            const endTime = new Date(document.getElementById("endTime").value);
+
+            if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) {
+              alert("入庫時間と出庫時間を正しく入力してください。");
+            return;
+        }
+
+            //時間差を分単位で計算
+            const timeDifferenceMinutes = (endTime.getTime() - startTime.getTime()) / (1000 * 60);
+
+            //料金設定
+            const baseFee = 200; //初期料金
+            const additionalFeePer30Minutes = 100; //30分ごとの追加料金
+            const maxFee = 1000; //最大料金
+
+            //計算
+            let totalFee = baseFee;
+
+            //30分単位で料金を追加
+            let additionalMinutes = Math.ceil(timeDifferenceMinutes / 30);
+
+        if (additionalMinutes > 0) {
+              totalFee += additionalMinutes * additionalFeePer30Minutes;
+        }
+
+        //最大料金を超えないように調整
+        if (totalFee > maxFee) {
+              totalFee = maxFee;
+        }
+
+            //結果を表示
+            document.getElementById("result").innerHTML = `
+            <p>合計料金： ${totalFee}円</p>
+            `;
+
+      }
+    </script>
+
+    <br>
+
+    <!--料金計算表-->
+    <!--自動で次のフォームにカーソルを合わせるコード-->
+    <script>
+      function nextfeild(str) {
+        if (str.value.length >= str.maxLength) {
+          for (var i = 0, elm = str.form.elements; i < elm.length; i++) {
+            if (elm[i] == str) {
+              (elm[i + 1] || elm[0]).focus();
+              break;
+            }
+          }
+        }
+        return str;
+      }
+    </script>
+    <form name="form">
+      <label for="starttime">入庫時間：</label>
+      <input type="text" size="2" name="start" id="start" maxlength="2" placeholder="00" onkeyup="nextfeild(this)"> :
+      <input type="text" size="2" name="startMin" id="startMin" maxlength="2" placeholder="00"
+        onkeyup="nextfeild(this)">
+      <br>
+
+      <label for="endtime">出庫時間：</label>
+      <input type="text" size="2" name="end" id="end" maxlength="2" placeholder="00" onkeyup="nextfeild(this)"> :
+      <input type="text" size="2" name="endMin" id="endMin" maxlength="2" placeholder="00"
+        onkeyup="nextfeild(this)"><br><br>
+      <input type="button" value="料金計算" onclick="return check();"> <!--onClickというのは、イベントハンドラと呼ばれるもので、ユーザー操作を取得するためのもの-->
+
+    </form>
+
+    <script>
+            function onclick(){
+        //1つ目の入力ボックスの値を取得する
+        var value1 = document.getElementById("start").value;
+            //2つ目の入力ボックスの値を取得する
+            var value2 = document.getElementById("startMin").value;
+            //3つ目の入力ボックスの値を取得する
+            var value3 = document.getElementById("end").value;
+            //4つ目の入力ボックスの値を取得する
+            var value4 = document.getElementById("endMin").value;
+            //引き算する(時)
+            var result1 = parseInt(value3) - parseInt(value1);
+        //ひきざん
+
+        //値を設定する
+      }
+    </script>
+  </div>
+
+</body>
+
+</html>

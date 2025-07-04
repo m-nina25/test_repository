@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>コインパーキング料金計算</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f9f9f9;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .calculator {
+      background-color: #fff;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      margin-bottom: 0.3rem;
+      font-weight: bold;
+    }
+
+    input[type="datetime-local"] {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 1.5rem;
+      padding: 0.7rem;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a045;
+    }
+
+    .result {
+      margin-top: 2rem;
+      background-color: #f3f3f3;
+      border-radius: 8px;
+      padding: 1rem;
+    }
+
+    .result p {
+      margin: 0.5rem 0;
+      font-size: 1.1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="calculator">
+    <h2>🅿️ コインパーキング料金計算</h2>
+
+    <label for="start">入庫時間</label>
+    <input type="datetime-local" id="start">
+
+    <label for="end">出庫時間</label>
+    <input type="datetime-local" id="end">
+
+    <button onclick="calculate()">🧮 計算する</button>
+
+    <div class="result" id="result" style="display: none;">
+      <p>⏱ 駐車時間: <span id="duration"></span></p>
+      <p>💰 合計金額: <span id="fee"></span> 円</p>
+    </div>
+  </div>
+
+  <script>
+    function calculate() {
+      const start = new Date(document.getElementById("start").value);
+      const end = new Date(document.getElementById("end").value);
+
+      if (isNaN(start) || isNaN(end) || end <= start) {
+        alert("正しい入庫・出庫時間を入力してください。");
+        return;
+      }
+
+      const diffMs = end - start;
+      const diffMin = Math.ceil(diffMs / 1000 / 60); // 分単位
+      const hours = Math.floor(diffMin / 60);
+      const minutes = diffMin % 60;
+
+      // 料金計算（例：最初の1時間500円、以降30分ごと200円、上限1500円）
+      let fee = 0;
+
+      if (diffMin <= 60) {
+        fee = 500;
+      } else {
+        fee = 500 + Math.ceil((diffMin - 60) / 30) * 200;
+      }
+
+      if (fee > 1500) fee = 1500;
+
+      // 結果表示
+      document.getElementById("duration").textContent = `${hours}時間${minutes}分`;
+      document.getElementById("fee").textContent = fee.toLocaleString();
+      document.getElementById("result").style.display = "block";
+    }
+  </script>
+
+</body>
+</html>
